@@ -1,0 +1,82 @@
+import express from "express";
+import mysql from "mysql";
+import { VoteGetXlable } from "../model/voteGetXlable";
+export const router = express.Router();
+export const conn = mysql.createPool({
+  connectionLimit: 10,
+  host: "202.28.34.197",
+  user: "web65_64011212086",
+  password: "64011212086@csmsu",
+  database: "web65_64011212086",
+});
+router.get("/", (req, res) => {
+  conn.query(
+    `SELECT
+    ROW_NUMBER() OVER (
+      ORDER BY img.score DESC
+      ) number , 
+    img.id_img,
+    img.img,
+    img.name,
+    img.score AS Adv_img_score,
+    COUNT(vote.id_vote) AS countvote
+    FROM Adv_img img
+    LEFT JOIN Adv_vote vote ON img.id_img = vote.id_img
+    GROUP BY img.id_img, img.score 
+    ORDER BY img.score DESC`,
+    (err, result) => {
+      if (err) {
+        res.status(500).json(err);
+      } else {
+        res.status(200).json(result);
+      }
+    }
+  );
+});
+router.post("/xlabel", (req, res) => {
+  const xlabel: VoteGetXlable = req.body;
+  let sql = "SELECT DATE_FORMAT(date_time, '%H:%i') AS time FROM Adv_vote where date_time LIKE ? and id_img = ? ";
+  sql = mysql.format(sql,["%"+xlabel.date+"%",xlabel.id_img])
+  conn.query(sql, (err, result) => {
+    if (err) {
+      res.status(500).json(err);
+    } else {
+      res.status(200).json(result);
+    }
+  });
+});
+router.post("/ylabel", (req, res) => {
+  const xlabel: VoteGetXlable = req.body;
+  let sql = "SELECT score,DATE_FORMAT(date_time, '%H:%i') as time ,DATE_FORMAT(date_time, '%Y-%m-%d') AS day   FROM Adv_vote where  id_img = ?  LIMIT 1000";
+  sql = mysql.format(sql,[xlabel.id_img])
+  conn.query(sql, (err, result) => {
+    if (err) {
+      res.status(500).json(err);
+    } else {
+      res.status(200).send(result);
+    }
+  });
+});
+router.post("/", async (req, res) => {
+  const user = req.body;
+  const moment = require("moment");
+  const formattedDateTime = moment(new Date().toLocaleString()).format(
+    "Y-MM-DD HH:mm:ss"
+  );
+  // console.log(formattedDateTime);
+  let sql =
+    "INSERT INTO `Adv_vote`(`id_img`, `username`, `date_time`, `score`) VALUES (?,?,?,?)";
+  sql = mysql.format(sql, [
+    user.id_img,
+    user.username,
+    formattedDateTime,
+    user.score,
+  ]);
+  //   res.send(formattedDateTime);
+  conn.query(sql, (err, result) => {
+    res
+      .status(200)
+      .json({ affected_row: result.affectedRows, last_idx: result.insertId });
+  });
+  //   res.send(haspasswd);
+});

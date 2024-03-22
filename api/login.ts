@@ -14,7 +14,7 @@ export const conn = mysql.createPool({
   database: "web65_64011212086",
 });
 
-router.get("/",  (req, res) => {
+router.post("/",  (req, res) => {
   const user: GetUser = req.body;
   let sql = "SELECT * FROM `Adv_user` WHERE email=?"
   sql = mysql.format(sql,[user.email])
