@@ -14,35 +14,47 @@ export const conn = mysql.createPool({
 });
 router.put("/editProfile", (req, res) => {
 
-    const user: PostUserRespone = req.body;
-    console.log(req.body);
-    let sql = "SELECT * FROM `Adv_user` WHERE id_user = ?";
+  const user: PostUserRespone = req.body;
+  console.log(req.body);
+  let sql = "SELECT * FROM `Adv_user` WHERE id_user = ?";
 
-    sql = mysql.format(sql,[user.id_user])
-    conn.query(sql, async (err,result)=>{
-        const userRes: PostUserRespone = result[0];
-        try {
-          const resLogin = await bcrypt.compare(
-            user.password,
-            userRes.password
-          );
-          if (resLogin) {
-            let sql = "UPDATE `Adv_user` SET `username`=?,`img_avatar`=? WHERE id_user=?";
-            sql = mysql.format(sql,[user.username,user.img_avatar,user.id_user])
-            conn.query(sql, async (err,result)=>{
-                if (err) {
-                    res.status(500).json(err);
-                } else {
-                    res.status(200).json(result);
-                }
-                })
-            // res.status(200).json(userRes);
+  sql = mysql.format(sql, [user.id_user])
+  conn.query(sql, async (err, result) => {
+    const userRes: PostUserRespone = result[0];
+    try {
+      const resLogin = await bcrypt.compare(
+        user.password,
+        userRes.password
+      );
+      if (resLogin) {
+        let sql = "UPDATE `Adv_user` SET `username`=?,`img_avatar`=? WHERE id_user=?";
+        sql = mysql.format(sql, [user.username, user.img_avatar, user.id_user])
+        conn.query(sql, async (err, result) => {
+          if (err) {
+            res.status(500).json(err);
           } else {
-            res.status(204).json(err);
+            res.status(200).json(result);
           }
-        } catch (error) {
-          res.status(500).json(error);
-        }
-        // res.send(result);
-    })
+        })
+        // res.status(200).json(userRes);
+      } else {
+        res.status(204).json(err);
+      }
+    } catch (error) {
+      res.status(500).json(error);
+    }
+    // res.send(result);
+  })
+});
+router.get("/usersByType/:type", (req, res) => {
+  const userType = req.params.type;
+  let sql = "SELECT * FROM `Adv_user` WHERE `type` = ?";
+  sql = mysql.format(sql, [userType]);
+  conn.query(sql, (err, result) => {
+    if (err) {
+      res.status(500).json(err);
+    } else {
+      res.status(200).json(result);
+    }
   });
+});
