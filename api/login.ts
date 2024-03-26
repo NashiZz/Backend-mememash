@@ -38,7 +38,7 @@ router.post("/",  (req, res) => {
   
 //   res.send(user);
 });
-router.post("/singin", async (req, res) => {
+router.post("/signin", async (req, res) => {
   const user: PostUser = req.body;
   const status = "user";
   const haspasswd = await bcrypt.hash(user.password, 10);

@@ -11,44 +11,56 @@ export const conn = mysql.createPool({
 });
 
 router.get("/", (req, res) => {
-    conn.query('select * from Adv_img ',(err,result)=>{
-        if (err){
-            res.status(500).json(err);
-        }else{
-            res.status(200).json(result);
-        }
-    });
-    // res.send('Get in trip.ts id: '+ req.params.id);
+  conn.query('select * from Adv_img ', (err, result) => {
+    if (err) {
+      res.status(500).json(err);
+    } else {
+      res.status(200).json(result);
+    }
   });
+  // res.send('Get in trip.ts id: '+ req.params.id);
+});
 
-  router.put("/:id", async (req, res) => {
-    let id = +req.params.id;
-    let image: putImageReq = req.body;
-    let sql = "UPDATE `Adv_img` SET `img`=?,`id_user`=?,`name`=?,`score`=? WHERE `id_img`=?";
-    sql = mysql.format(sql,[
-      image.img,
-      image.id_user,
-      image.name,
-      image.score,
-      id
-    ]);
-    conn.query(sql, (err, result) => {
-      if (err) throw err;
-      res
-        .status(200)
-        .json({ affected_row: result.affectedRows });
-    });
+router.put("/:id", async (req, res) => {
+  let id = +req.params.id;
+  let image: putImageReq = req.body;
+  let sql = "UPDATE `Adv_img` SET `img`=?,`id_user`=?,`name`=?,`score`=? WHERE `id_img`=?";
+  sql = mysql.format(sql, [
+    image.img,
+    image.id_user,
+    image.name,
+    image.score,
+    id
+  ]);
+  conn.query(sql, (err, result) => {
+    if (err) throw err;
+    res
+      .status(200)
+      .json({ affected_row: result.affectedRows });
   });
-  router.get("/top", (req, res) => {
-    conn.query('SELECT * FROM Adv_img ORDER BY score DESC LIMIT 10',(err,result)=>{
-        if (err){
-            res.status(500).json(err);
-        }else{
-            res.status(200).json(result);
-        }
-    });
-    // res.send('Get in trip.ts id: '+ req.params.id);
+});
+router.get("/top", (req, res) => {
+  conn.query('SELECT * FROM Adv_img ORDER BY score DESC LIMIT 10', (err, result) => {
+    if (err) {
+      res.status(500).json(err);
+    } else {
+      res.status(200).json(result);
+    }
   });
+  // res.send('Get in trip.ts id: '+ req.params.id);
+});
+router.delete("/:id", (req, res) => {
+  let id = +req.params.id;
+  let sql = "DELETE FROM `Adv_img` WHERE `id_img`=?";
+  sql = mysql.format(sql, [id]);
+  conn.query(sql, (err, result) => {
+    if (err) {
+      res.status(500).json(err);
+    } else {
+      res.status(200).json({ affected_row: result.affectedRows });
+    }
+  });
+});
 // router.post("/", async (req, res) => {
 //   const user = req.body;
 //   const moment = require("moment");
