@@ -69,9 +69,7 @@ router.post("/ylabel", (req, res) => {
 router.post("/", async (req, res) => {
   const user = req.body;
   const moment = require("moment");
-  const formattedDateTime = moment(new Date().toLocaleString()).format(
-    "Y-MM-DD HH:mm:ss"
-  );
+  const formattedDateTime = moment().format("YYYY-MM-DD HH:mm:ss");
   // console.log(formattedDateTime);
   let sql =
     "INSERT INTO `Adv_vote`(`id_img`, `username`, `date_time`, `score`) VALUES (?,?,?,?)";
