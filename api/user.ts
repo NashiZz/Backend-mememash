@@ -46,15 +46,3 @@ router.put("/editProfile", (req, res) => {
     // res.send(result);
   })
 });
-router.get("/usersByType/:type", (req, res) => {
-  const userType = req.params.type;
-  let sql = "SELECT * FROM `Adv_user` WHERE `type` = ?";
-  sql = mysql.format(sql, [userType]);
-  conn.query(sql, (err, result) => {
-    if (err) {
-      res.status(500).json(err);
-    } else {
-      res.status(200).json(result);
-    }
-  });
-});
