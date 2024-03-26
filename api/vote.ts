@@ -83,9 +83,12 @@ router.post("/", async (req, res) => {
   ]);
   //   res.send(formattedDateTime);
   conn.query(sql, (err, result) => {
-    res
-      .status(200)
+      if (err) {
+        res.status(500).json(err);
+      } else {
+        res.status(200)
       .json({ affected_row: result.affectedRows, last_idx: result.insertId });
+      }
   });
   //   res.send(haspasswd);
 });
