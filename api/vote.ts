@@ -38,12 +38,12 @@ router.post("/ranking", (req, res) => {
   const body : VotePostDateReq = req.body;
   const date = "%"+body.date+"%"
   let sql = `SELECT ROW_NUMBER() OVER (ORDER BY max(vote.score) DESC) AS number,
-        img.name,img.img,vote.id_img ,max(vote.score) as score
+        img.name,img.img,vote.id_img ,max(vote.score) as score ,max(vote.date_time) as date
         FROM Adv_img img
         LEFT JOIN Adv_vote vote ON img.id_img = vote.id_img
-        WHERE vote.date_time LIKE ?
+     
         GROUP BY vote.id_img , img.name ,img.img 
-        ORDER BY max(vote.score) DESC`;
+        ORDER BY max(vote.score) DESC, max(vote.date_time) DESC `;
   sql = mysql.format(sql,[date])
   conn.query(sql,(err, result) => {
       if (err) {
